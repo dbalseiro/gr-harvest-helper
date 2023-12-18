@@ -24,6 +24,22 @@ function detectGithub() {
   return document && document.getElementsByClassName('js-issue-title').length > 0;
 }
 
+function detectNotion() {
+  const html = document.getElementsByTagName("html");
+  if (html[0].className === "notion-html") {
+    console.log("html found");
+    const header = document.getElementsByTagName("header")[0];
+    const arrayOf = elem => Array.from(header.getElementsByTagName(elem));
+    const spans = arrayOf("span").concat(arrayOf("div"))
+    for (i in spans) {
+      if (spans[i].innerText === "Kanban board") {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 async function jiraGetIssueTitle() {
   let issueId;
   let issueIdMatches = document.title.match(/\[(.*?)]/);
@@ -80,6 +96,25 @@ function githubGetIssueTitle() {
   };
 }
 
+function notionGetIssueTitle() {
+  var divs = document.getElementsByTagName("div");
+  var taskId;
+  for (i in divs) {
+    var possibleId = divs[i].innerText;
+    if (possibleId.startsWith("ENG-")) {
+      taskId = possibleId;
+      break;
+    }
+  }
+  var titles = document.getElementsByTagName("h1");
+  var taskName = titles[titles.length - 1].innerText;
+  var title = `[${taskId}]: ${taskName}`;
+  return {
+    id: taskId,
+    title: title,
+  };
+}
+
 if (detectJira()) {
   GRlog('jira detected');
   jiraGetIssueTitle().then((res) => {
@@ -94,4 +129,7 @@ if (detectJira()) {
 } else if (detectGithub()) {
   GRlog('github detected');
   chrome.runtime.sendMessage(githubGetIssueTitle());
+} else if (detectNotion()) {
+  chrome.runtime.sendMessage(notionGetIssueTitle());
+  GRlog('notion detected');
 }

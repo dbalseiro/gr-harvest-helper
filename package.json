@@ -6,7 +6,8 @@
   "author": "Lincoln Loop",
   "scripts": {
     "lint": "eslint . --fix",
-    "build:firefox": "web-ext build --source-dir src --artifacts-dir dist --overwrite-dest"
+    "build:firefox": "web-ext build --source-dir src --artifacts-dir dist --overwrite-dest",
+    "run:firefox": "web-ext run --source-dir src"
   },
   "devDependencies": {
     "crx": "^5.0.1",
